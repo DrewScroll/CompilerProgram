@@ -1,0 +1,10 @@
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\bin\Debug\WFCompilerUI.exe.config
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\bin\Debug\WFCompilerUI.exe
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\bin\Debug\WFCompilerUI.pdb
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.Form1.resources
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.Properties.Resources.resources
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.csproj.GenerateResource.Cache
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.exe
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.pdb
+C:\Users\Lenovo\Documents\Visual Studio 2017\Projects\WFCompilerUI\obj\Debug\WFCompilerUI.csprojResolveAssemblyReference.cache
