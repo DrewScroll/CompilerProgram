@@ -65,7 +65,7 @@ cli::array<String^>^ Compilador::Manager::getAllTokens()
 			String ^ typ = gcnew String(allTokensVec[i]->getTypeStr().c_str());
 
 			allTokens[i] = gcnew String("");
-			allTokens[i] = String::Format("[0]\t\t(1)", templex, typ);
+			allTokens[i] = String::Format("{0}\t\t{1}", templex, typ);
 		}
 	}
 	else
