@@ -3,7 +3,7 @@
 
 
 
-Compilador::Token::Token(std::string lex, TOKEN_TYPE type, int lineNum)
+Compilador::Token::Token(std::string lex, TOKEN_TYPE type, int lineNum) : m_Lex(lex), m_Type(type), m_LineNumber(lineNum)
 {
 }
 
