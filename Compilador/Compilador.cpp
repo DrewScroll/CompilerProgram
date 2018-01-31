@@ -41,8 +41,8 @@ cli::array<String^>^ Compilador::Manager::compile(String ^ program)
 		}
 	//Lex Analisis
 	lex->parseCode((const char*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(program).ToPointer());
-
-		compilationDetails = getCompilationDetails();
+	
+	compilationDetails = getCompilationDetails();
 
 	return compilationDetails;
 
@@ -63,7 +63,7 @@ cli::array<String^>^ Compilador::Manager::getAllTokens()
 		{
 			String ^ templex = gcnew String(allTokensVec[i]->getLex().c_str());
 			String ^ typ = gcnew String(allTokensVec[i]->getTypeStr().c_str());
-
+			
 			allTokens[i] = gcnew String("");
 			allTokens[i] = String::Format("{0}\t\t{1}", templex, typ);
 		}

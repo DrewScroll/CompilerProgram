@@ -238,6 +238,11 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				m_State = S_PARSING_STRING;
 				currentChar++;
 			}
+			else if (*currentChar == '.')
+			{
+				addError(currentLineNumber, LEX_ERROR_INVALID_FLOAT, currentLine);
+				currentChar++;
+			}
 			break;
 		case S_PARSING_ID:
 			if (isAlpha(currentChar) || *currentChar == '_' || isDigit(currentChar))
@@ -284,10 +289,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				currentChar++;
 				if (*currentChar == lexSrcEof)
 				{
-					if (m_Keywords.find(tokenBuffer) != m_Keywords.end())
-					{
-						addToken(tokenBuffer.c_str(), TOKEN_TYPE::INT, currentLineNumber);
-					}
+					addToken(tokenBuffer.c_str(), TOKEN_TYPE::INT, currentLineNumber);
 				}
 			}
 			else if (*currentChar == '.')
