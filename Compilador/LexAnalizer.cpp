@@ -85,16 +85,14 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (isArithmeticOp(currentChar))
 			{
-				tokenBuffer.clear();
-
-				if (*currentChar == '/' && *currentChar + 1 == '/')
+				if (*currentChar == '/' && *(currentChar + 1) == '*')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_COMMENT;
 					currentChar++;
 				}
 				else
 				{
+					tokenBuffer.clear();
 					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_ARITHMETICOP;
 					currentChar++;
@@ -411,17 +409,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			m_State = S_START;
 			break;
 		case S_PARSING_ARITHMETICOP:
-			if (currentChar - 1 == "/" && currentChar == "*")
-			{
-				tokenBuffer.append(currentChar, 1);
-				currentChar++;
-				m_State = S_PARSING_COMMENT;
-			}
-			else
-			{
-				addToken(tokenBuffer.c_str(), TOKEN_TYPE::ARITHMETIC_OPERATOR, currentLineNumber);
-				m_State = S_START;
-			}
+			addToken(tokenBuffer.c_str(), TOKEN_TYPE::ARITHMETIC_OPERATOR, currentLineNumber);
+			m_State = S_START;
 			break;
 		case S_PARSING_LOGICAL_OP_AND:
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::LOGICAL_OPERATOR, currentLineNumber);
@@ -432,7 +421,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			m_State = S_START;
 			break;
 		case S_PARSING_LOGICAL_OP_NOT:
-			if (currentChar == "=")
+			if (*currentChar == '=')
 			{
 				tokenBuffer.append(currentChar, 1);
 				currentChar++;
@@ -475,7 +464,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 		case S_PARSING_COMMENT:
 			while (currentChar != NULL)
 			{
-				if (currentChar != "*" && currentChar + 1 != "/")
+				if (*currentChar != '*' && *(currentChar + 1) != '/')
 				{
 					currentChar++;
 				}
