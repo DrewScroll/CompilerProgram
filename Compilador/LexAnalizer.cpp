@@ -464,7 +464,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 		case S_PARSING_COMMENT:
 			while (currentChar != NULL)
 			{
-				if (*currentChar != '*' && *(currentChar + 1) != '/')
+				if (*(currentChar - 1) != '*' && *currentChar != '/')
 				{
 					currentChar++;
 				}
@@ -474,7 +474,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					break;
 				}
 			}
-			if (currentChar == NULL)
+			if (*currentChar == lexSrcEof)
 			{
 				addError(currentLineNumber, LEX_ERROR_COMMENT_NOT_CLOSED, currentLine);
 			}
