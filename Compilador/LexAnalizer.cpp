@@ -85,18 +85,21 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (isArithmeticOp(currentChar))
 			{
-				if (*currentChar == '/' && *(currentChar + 1) == '*')
+				if (*currentChar == '/')
 				{
-					m_State = S_PARSING_COMMENT;
 					currentChar++;
+					if (*currentChar == '*')
+					{
+						m_State = S_PARSING_COMMENT;
+						currentChar++;
+						break;
+					}
+					currentChar--;
 				}
-				else
-				{
-					tokenBuffer.clear();
-					tokenBuffer.append(currentChar, 1);
-					m_State = S_PARSING_ARITHMETICOP;
-					currentChar++;
-				}
+				tokenBuffer.clear();
+				tokenBuffer.append(currentChar, 1);
+				m_State = S_PARSING_ARITHMETICOP;
+				currentChar++;
 			}
 			else if (isRelationalOp(currentChar))
 			{
@@ -232,6 +235,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (isStringLiteral(currentChar))
 			{
+				tokenBuffer.clear();
 				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_STRING;
 				currentChar++;
@@ -323,7 +327,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			{
 				addToken(tokenBuffer.c_str(), TOKEN_TYPE::FLOAT, currentLineNumber);
 				m_State = S_START;
-				if(!isDigit(currentChar-1))
+				if (!isDigit(currentChar - 1))
 				{
 					addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, currentLine);
 				}
@@ -341,6 +345,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else
 			{
+				tokenBuffer.append(currentChar, 1);
+				currentChar++;
 				addToken(tokenBuffer.c_str(), TOKEN_TYPE::STRING, currentLineNumber);
 				m_State = S_START;
 			}
@@ -462,23 +468,28 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			m_State = S_START;
 			break;
 		case S_PARSING_COMMENT:
-			while (currentChar != NULL)
+			while (*currentChar != lexSrcEof)
 			{
-				if (*(currentChar - 1) != '*' && *currentChar != '/')
+				if (*currentChar == '*')
 				{
 					currentChar++;
+					if (*currentChar == '/')
+					{
+						currentChar++;
+						m_State = S_START;
+						break;
+					}
 				}
 				else
 				{
-					m_State = S_START;
-					break;
+					currentChar++;
 				}
 			}
 			if (*currentChar == lexSrcEof)
 			{
 				addError(currentLineNumber, LEX_ERROR_COMMENT_NOT_CLOSED, currentLine);
+				break;
 			}
-			break;
 		default:
 			break;
 		}
@@ -505,6 +516,7 @@ void Compilador::LexAnalyzer::getTokens(std::vector<Token *> *tokensVec) const
 */
 void Compilador::LexAnalyzer::addError(int lineNum, const char *desc, const char *line)
 {
+	
 	String ^ strDesc = gcnew String(desc);
 	String ^ strLine = gcnew String(line);
 	managedRef_errorsModule->addError(Compilador::ERROR_PHASE::LEX_ANALYZER, lineNum, strDesc, strLine);
