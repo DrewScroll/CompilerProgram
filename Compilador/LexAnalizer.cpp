@@ -62,16 +62,12 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			if (isAlpha(currentChar) || *currentChar == '_')
 			{
 				tokenBuffer.clear();
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_ID;
-				currentChar++;
 			}
 			else if (isDigit(currentChar))
 			{
 				tokenBuffer.clear();
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_INT;
-				currentChar++;
 			}
 			else if (isSpace(currentChar))
 			{
@@ -90,36 +86,27 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					if (*currentChar == '*')
 					{
 						m_State = S_PARSING_COMMENT;
-						currentChar++;
 						break;
 					}
 					currentChar--;
 				}
 				tokenBuffer.clear();
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_ARITHMETICOP;
-				currentChar++;
 			}
 			else if (isRelationalOp(currentChar))
 			{
 				tokenBuffer.clear();
 				if (*currentChar == '<')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_LESSTHAN;
-					currentChar++;
 				}
 				else if (*currentChar == '>')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_GREATERTHAN;
-					currentChar++;
 				}
 				else if (*currentChar == '=')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_ASSIGN;
-					currentChar++;
 				}
 			}
 			else if (isLogicalOp(currentChar))
@@ -131,9 +118,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					currentChar++;
 					if (*currentChar == '&')
 					{
-						tokenBuffer.append(currentChar, 1);
 						m_State = S_PARSING_LOGICAL_OP_AND;
-						currentChar++;
 					}
 					else
 					{
@@ -147,9 +132,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					currentChar++;
 					if (*currentChar == '|')
 					{
-						tokenBuffer.append(currentChar, 1);
 						m_State = S_PARSING_LOGICAL_OP_OR;
-						currentChar++;
 					}
 					else
 					{
@@ -159,9 +142,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				}
 				else if (*currentChar == '!')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_LOGICAL_OP_NOT;
-					currentChar++;
 				}
 			}
 			else if (isSeparator(currentChar))
@@ -169,21 +150,15 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				tokenBuffer.clear();
 				if (*currentChar == ',')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_COMMA;
-					currentChar++;
 				}
 				else if (*currentChar == ':')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_COLON;
-					currentChar++;
 				}
 				else if (*currentChar == ';')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_SEMICOLON;
-					currentChar++;
 				}
 			}
 			else if (isGroupingChar(currentChar))
@@ -191,15 +166,11 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				tokenBuffer.clear();
 				if (*currentChar == '(')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_OPENPARENTHESIS;
-					currentChar++;
 				}
 				else if (*currentChar == ')')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_CLOSEPARENTHESIS;
-					currentChar++;
 				}
 			}
 			else if (isBlockChar(currentChar))
@@ -207,15 +178,11 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				tokenBuffer.clear();
 				if (*currentChar == '{')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_OPENCURLYBRACKET;
-					currentChar++;
 				}
 				else if (*currentChar == '}')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_CLOSECURLYBRACKET;
-					currentChar++;
 				}
 			}
 			else if (isDimensionChar(currentChar))
@@ -223,21 +190,15 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				tokenBuffer.clear();
 				if (*currentChar == '[')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_OPENBRACKET;
-					currentChar++;
 				}
 				else if (*currentChar == ']')
 				{
-					tokenBuffer.append(currentChar, 1);
 					m_State = S_PARSING_CLOSEBRACKET;
-					currentChar++;
 				}
 			}
 			else if (isStringLiteral(currentChar))
 			{
-				tokenBuffer.clear();
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_STRING;
 				currentChar++;
 			}
@@ -298,9 +259,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (*currentChar == '.')
 			{
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_FLOAT;
-				currentChar++;
 			}
 			else if (isSeparator(currentChar) || isNewLine(currentChar))
 			{
@@ -314,30 +273,27 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			break;
 		case S_PARSING_FLOAT:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			if (isDigit(currentChar))
 			{
 				tokenBuffer.append(currentChar, 1);
 				currentChar++;
 				if (*currentChar == lexSrcEof)
 				{
-					if (m_Keywords.find(tokenBuffer) != m_Keywords.end())
-					{
-						addToken(tokenBuffer.c_str(), TOKEN_TYPE::FLOAT, currentLineNumber);
-					}
+					addToken(tokenBuffer.c_str(), TOKEN_TYPE::FLOAT, currentLineNumber);
 				}
 			}
 			else
 			{
-				addToken(tokenBuffer.c_str(), TOKEN_TYPE::FLOAT, currentLineNumber);
+				lineBuffer = getCurrentLine(currentChar, currentLine);
+				addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
 				m_State = S_START;
-				if (!isDigit(currentChar - 1))
-				{
-					lineBuffer = getCurrentLine(currentChar, currentLine);
-					addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
-				}
 			}
 			break;
 		case S_PARSING_STRING:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			if (!isStringLiteral(currentChar))
 			{
 				if (isNewLine(currentChar))
@@ -348,23 +304,25 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					m_State = S_START;
 					break;
 				}
-				tokenBuffer.append(currentChar, 1);
-				currentChar++;
+				else if (*currentChar == lexSrcEof)
+				{
+					lineBuffer = getCurrentLine(currentChar, currentLine);
+					addError(currentLineNumber, LEX_ERROR_STRING_NOT_CLOSED, lineBuffer);
+					m_State = S_START;
+				}
 			}
 			else
 			{
-				tokenBuffer.append(currentChar, 1);
-				currentChar++;
 				addToken(tokenBuffer.c_str(), TOKEN_TYPE::STRING, currentLineNumber);
 				m_State = S_START;
 			}
 			break;
 		case S_PARSING_LESSTHAN:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			if(*currentChar == '=')
 			{
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_LESSTHANOREQUAL;
-				currentChar++;
 			}
 			else
 			{
@@ -373,15 +331,17 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			break;
 		case S_PARSING_LESSTHANOREQUAL:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::RELATIONAL_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_GREATERTHAN:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			if (*currentChar == '=')
 			{
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_GREATERTHANOREQUAL;
-				currentChar++;
 			}
 			else
 			{
@@ -390,15 +350,17 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			break;
 		case S_PARSING_GREATERTHANOREQUAL:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::RELATIONAL_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_ASSIGN:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			if (*currentChar == '=')
 			{
-				tokenBuffer.append(currentChar, 1);
 				m_State = S_PARSING_EQUAL;
-				currentChar++;
 			}
 			else
 			{
@@ -407,38 +369,52 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			break;
 		case S_PARSING_EQUAL:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::RELATIONAL_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_NOTEQUAL:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::RELATIONAL_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_OPENPARENTHESIS:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::GROUPING_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_CLOSEPARENTHESIS:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::GROUPING_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_ARITHMETICOP:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::ARITHMETIC_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_LOGICAL_OP_AND:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::LOGICAL_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_LOGICAL_OP_OR:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::LOGICAL_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_LOGICAL_OP_NOT:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			if (*currentChar == '=')
 			{
-				tokenBuffer.append(currentChar, 1);
-				currentChar++;
 				m_State = S_PARSING_NOTEQUAL;
 			}
 			else
@@ -448,34 +424,49 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			break;
 		case S_PARSING_OPENBRACKET:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::DIMENSION_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_CLOSEBRACKET:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::DIMENSION_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_OPENCURLYBRACKET:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::GROUPING_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_CLOSECURLYBRACKET:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::GROUPING_OPERATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_SEMICOLON:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::SEPARATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_COMMA:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::SEPARATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_COLON:
+			tokenBuffer.append(currentChar, 1);
+			currentChar++;
 			addToken(tokenBuffer.c_str(), TOKEN_TYPE::SEPARATOR, currentLineNumber);
 			m_State = S_START;
 			break;
 		case S_PARSING_COMMENT:
+			currentChar++;
 			while (*currentChar != lexSrcEof)
 			{
 				if (*currentChar == '*')
@@ -483,7 +474,6 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					currentChar++;
 					if (*currentChar == '/')
 					{
-						currentChar++;
 						m_State = S_START;
 						break;
 					}
@@ -499,6 +489,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				addError(currentLineNumber, LEX_ERROR_COMMENT_NOT_CLOSED, lineBuffer);
 				break;
 			}
+			currentChar++;
+			break;
 		default:
 			break;
 		}
@@ -560,7 +552,7 @@ void Compilador::LexAnalyzer::clearTokens()
 std::string Compilador::LexAnalyzer::getCurrentLine(const char *character, const char *line)
 {
 	std::string lineBuffer;
-	int numCharsInLine = (character - line) + 1;
+	int numCharsInLine = (character - line);
 	lineBuffer.clear();
 	lineBuffer.append(line, numCharsInLine);
 	lineBuffer.append(" <---");
