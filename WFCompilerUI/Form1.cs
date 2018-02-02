@@ -13,11 +13,22 @@ namespace WFCompilerUI
 {
     public partial class Form1 : Form
     {
+        private string currentFilename;
         Compilador.Manager compiler;
         public Form1()
         {
             InitializeComponent();
+            currentFilename = "";
             compiler = new Compilador.Manager();
+        }
+
+        private void quickSave()
+        {
+            string str_code = Input.Text.Trim();
+            StreamWriter writer = new StreamWriter(currentFilename, false);
+            writer.Write(str_code);
+            writer.Flush();
+            writer.Close();
         }
 
         private void saveCode()
@@ -25,11 +36,11 @@ namespace WFCompilerUI
             SaveFileDialog saveDialog = new SaveFileDialog();
             saveDialog.Filter = "Text file(.txt)|*.txt | All Files(*.*)|*.*";
             saveDialog.Title = "Save code";
-            if(saveDialog.ShowDialog() == DialogResult.OK)
+            saveDialog.ShowDialog();
+            if(saveDialog.FileName != "")
             {
-                StreamWriter write = new StreamWriter(File.Create(saveDialog.FileName));
-                write.Write(Input.Text);
-                write.Dispose();
+                currentFilename = saveDialog.FileName;
+                quickSave();
             }
         }
 
@@ -52,7 +63,14 @@ namespace WFCompilerUI
 
         private void SaveMenuItem_Click(object sender, EventArgs e)
         {
-
+            if(currentFilename == "")
+            {
+                saveCode();
+            }
+            else
+            {
+                quickSave();
+            }
         }
 
         private void compilarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -70,20 +88,45 @@ namespace WFCompilerUI
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (Input.Text.Trim() == "")
+            {
+                Application.Exit();
+            }
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenDoc()
         {
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.Filter = "Text file(.txt)|*.txt| All Files(*.*)|*.*";
             openFile.FilterIndex = 1;
             openFile.Title = "Open File";
-            if(openFile.ShowDialog() ==DialogResult.OK)
+            if (openFile.ShowDialog() == DialogResult.OK)
             {
                 StreamReader lector = new StreamReader(File.OpenRead(openFile.FileName));
                 Input.Text = lector.ReadToEnd();
                 lector.Dispose();
+            }
+            currentFilename = openFile.FileName;
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Input.Text.Trim() != "")
+            {
+                DialogResult result = MessageBox.Show("Desea guardar el documento?", "Guardar?", MessageBoxButtons.YesNoCancel);
+                if (result == DialogResult.Yes)
+                {
+                    quickSave();
+                    OpenDoc();
+                }
+                else if (result == DialogResult.No)
+                {
+                    OpenDoc();
+                }
+            }
+            else
+            {
+                OpenDoc();
             }
         }
     }

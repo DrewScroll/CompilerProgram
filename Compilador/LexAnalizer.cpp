@@ -41,12 +41,11 @@ Compilador::LexAnalyzer::~LexAnalyzer()
 bool Compilador::LexAnalyzer::parseCode(const char * src)
 {
 	int currentLineNumber = 1;
-	int numCharsInLine = 0;
 	int firstLineComment = 0;
 	const char * currentChar = src;
 	const char* currentLine = src;
 	std::string tokenBuffer;
-	std::string firstCommentLine;
+	std::string lineBuffer;
 	char lexSrcEof = '\0';
 	bool stringNotClosed = false;
 	TOKEN_TYPE tokenType = TOKEN_TYPE::UNDEFINED;
@@ -138,7 +137,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					}
 					else
 					{
-						addError(currentLineNumber, LEX_ERROR_INVALID_LOGICAL_OP_AND, currentLine);
+						lineBuffer = getCurrentLine(currentChar, currentLine);
+						addError(currentLineNumber, LEX_ERROR_INVALID_LOGICAL_OP_AND, lineBuffer);
 					}
 				}
 				else if (*currentChar == '|')
@@ -153,7 +153,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 					}
 					else
 					{
-						addError(currentLineNumber, LEX_ERROR_INVALID_LOGICAL_OP_OR, currentLine);
+						lineBuffer = getCurrentLine(currentChar, currentLine);
+						addError(currentLineNumber, LEX_ERROR_INVALID_LOGICAL_OP_OR, lineBuffer);
 					}
 				}
 				else if (*currentChar == '!')
@@ -242,7 +243,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (*currentChar == '.')
 			{
-				addError(currentLineNumber, LEX_ERROR_INVALID_FLOAT, currentLine);
+				lineBuffer = getCurrentLine(currentChar, currentLine);
+				addError(currentLineNumber, LEX_ERROR_INVALID_FLOAT, lineBuffer);
 				currentChar++;
 			}
 			break;
@@ -307,7 +309,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else
 			{
-				addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, currentLine);
+				lineBuffer = getCurrentLine(currentChar, currentLine);
+				addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
 			}
 			break;
 		case S_PARSING_FLOAT:
@@ -329,16 +332,21 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				m_State = S_START;
 				if (!isDigit(currentChar - 1))
 				{
-					addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, currentLine);
+					lineBuffer = getCurrentLine(currentChar, currentLine);
+					addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
 				}
 			}
 			break;
 		case S_PARSING_STRING:
 			if (!isStringLiteral(currentChar))
 			{
-				if (*currentChar == lexSrcEof)
+				if (isNewLine(currentChar))
 				{
-					addError(currentLineNumber, LEX_ERROR_STRING_NOT_CLOSED, currentLine);
+					lineBuffer = getCurrentLine(currentChar, currentLine);
+					addError(currentLineNumber, LEX_ERROR_STRING_NOT_CLOSED, lineBuffer);
+					currentChar++;
+					m_State = S_START;
+					break;
 				}
 				tokenBuffer.append(currentChar, 1);
 				currentChar++;
@@ -487,7 +495,8 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			if (*currentChar == lexSrcEof)
 			{
-				addError(currentLineNumber, LEX_ERROR_COMMENT_NOT_CLOSED, currentLine);
+				lineBuffer = getCurrentLine(currentChar, currentLine);
+				addError(currentLineNumber, LEX_ERROR_COMMENT_NOT_CLOSED, lineBuffer);
 				break;
 			}
 		default:
@@ -514,11 +523,11 @@ void Compilador::LexAnalyzer::getTokens(std::vector<Token *> *tokensVec) const
 
 /*
 */
-void Compilador::LexAnalyzer::addError(int lineNum, const char *desc, const char *line)
+void Compilador::LexAnalyzer::addError(int lineNum, const char *desc, std::string lineBuffer)
 {
 	
 	String ^ strDesc = gcnew String(desc);
-	String ^ strLine = gcnew String(line);
+	String ^ strLine = gcnew String(lineBuffer.c_str());
 	managedRef_errorsModule->addError(Compilador::ERROR_PHASE::LEX_ANALYZER, lineNum, strDesc, strLine);
 	m_Succeeded = false;
 }
@@ -546,6 +555,16 @@ void Compilador::LexAnalyzer::clearTokens()
 		}
 		m_Tokens.clear();
 	}
+}
+
+std::string Compilador::LexAnalyzer::getCurrentLine(const char *character, const char *line)
+{
+	std::string lineBuffer;
+	int numCharsInLine = (character - line) + 1;
+	lineBuffer.clear();
+	lineBuffer.append(line, numCharsInLine);
+	lineBuffer.append(" <---");
+	return lineBuffer;
 }
 
 /*

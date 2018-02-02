@@ -64,9 +64,10 @@ namespace Compilador
 		std::map<std::string, std::string> m_Keywords;					// KEYWORDS
 		std::vector<Token *> m_Tokens;									// TOKENS
 
-		void addError(int lineNum, const char *desc, const char *line);	// ADD ERROR TO ERRORS MODULE
+		void addError(int lineNum, const char *desc, std::string linebuffer);	// ADD ERROR TO ERRORS MODULE
 		void addToken(const char *lex, TOKEN_TYPE type, int lineNum);	// ADD TOKEN TO SYMBOLS TABLE AND TOKENS VECTOR
 		void clearTokens();												// FREE MEMORY AND CLEAR TOKENS VECTOR
+		std::string getCurrentLine(const char *character, const char *line);
 
 		bool isAlpha(const char *c) const;
 		bool isDigit(const char *c) const;
