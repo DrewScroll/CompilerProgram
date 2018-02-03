@@ -269,7 +269,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 				else
 				{
 					lineBuffer = getCurrentLine(currentChar, currentLine);
-					addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
+					addError(currentLineNumber, LEX_ERROR_INVALID_FLOAT, lineBuffer);
 					m_State = S_START;
 				}
 			}
@@ -553,7 +553,7 @@ void Compilador::LexAnalyzer::clearTokens()
 std::string Compilador::LexAnalyzer::getCurrentLine(const char *character, const char *line)
 {
 	std::string lineBuffer;
-	int numCharsInLine = (character - line);
+	int numCharsInLine = (character - line) + 1;
 	lineBuffer.clear();
 	lineBuffer.append(line, numCharsInLine);
 	lineBuffer.append(" <---");
