@@ -199,6 +199,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (isStringLiteral(currentChar))
 			{
+				tokenBuffer.clear();
 				m_State = S_PARSING_STRING;
 				currentChar++;
 			}
@@ -259,35 +260,34 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			}
 			else if (*currentChar == '.')
 			{
-				m_State = S_PARSING_FLOAT;
-			}
-			else if (isSeparator(currentChar) || isNewLine(currentChar))
-			{
-				addToken(tokenBuffer.c_str(), TOKEN_TYPE::INT, currentLineNumber);
-				m_State = S_START;
-			}
-			else
-			{
-				lineBuffer = getCurrentLine(currentChar, currentLine);
-				addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
-			}
-			break;
-		case S_PARSING_FLOAT:
-			tokenBuffer.append(currentChar, 1);
-			currentChar++;
-			if (isDigit(currentChar))
-			{
 				tokenBuffer.append(currentChar, 1);
 				currentChar++;
-				if (*currentChar == lexSrcEof)
+				if (isDigit(currentChar))
 				{
-					addToken(tokenBuffer.c_str(), TOKEN_TYPE::FLOAT, currentLineNumber);
+					m_State = S_PARSING_FLOAT;
+				}
+				else
+				{
+					lineBuffer = getCurrentLine(currentChar, currentLine);
+					addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
+					m_State = S_START;
 				}
 			}
 			else
 			{
-				lineBuffer = getCurrentLine(currentChar, currentLine);
-				addError(currentLineNumber, LEX_ERROR_INVALID_CHARACTER, lineBuffer);
+				addToken(tokenBuffer.c_str(), TOKEN_TYPE::INT, currentLineNumber);
+				m_State = S_START;
+			}
+			break;
+		case S_PARSING_FLOAT:
+			if (isDigit(currentChar))
+			{
+				tokenBuffer.append(currentChar, 1);
+				currentChar++;
+			}
+			else 
+			{
+				addToken(tokenBuffer.c_str(), TOKEN_TYPE::FLOAT, currentLineNumber);
 				m_State = S_START;
 			}
 			break;
@@ -314,6 +314,7 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 			else
 			{
 				addToken(tokenBuffer.c_str(), TOKEN_TYPE::STRING, currentLineNumber);
+				currentChar++;
 				m_State = S_START;
 			}
 			break;
