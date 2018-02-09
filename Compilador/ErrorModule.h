@@ -1,6 +1,6 @@
 #pragma once
 
-using namespace System;
+//using namespace System;
 
 namespace Compilador
 {
@@ -19,7 +19,9 @@ namespace Compilador
 	{
 	private:
 		int numErrors;
-		cli::array<String ^> ^ errorsArray;
+		int numErrorsLex;
+		int numErrorsSync;
+		cli::array<System::String ^> ^ errorsArray;
 
 	public:
 
@@ -27,7 +29,7 @@ namespace Compilador
 		~ErrorsModule();
 
 		void clearErrors();
-		bool addError(ERROR_PHASE errorPhase, int lineNumber, String ^ errorDesc, String ^ errorLine);
+		bool addError(ERROR_PHASE errorPhase, int lineNumber, System::String ^ errorDesc, System::String ^ errorLine);
 
 		property int NumErrors
 		{
@@ -45,11 +47,25 @@ namespace Compilador
 			}
 		}
 
-		property cli::array<String ^> ^ Errors
+		property cli::array<System::String ^> ^ Errors
 		{
-			cli::array<String ^> ^ get()
+			cli::array<System::String ^> ^ get()
 			{
 				return errorsArray;
+			}
+		}
+		property int NumErrorsLex
+		{
+			int get()
+			{
+				return numErrorsLex;
+			}
+		}
+		property int NumErrorsSyn
+		{
+			int get()
+			{
+				return numErrorsSync;
 			}
 		}
 	};

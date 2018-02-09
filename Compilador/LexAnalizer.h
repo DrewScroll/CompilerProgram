@@ -1,7 +1,7 @@
 #pragma once
 
-#include "windows.h"
-#include "vcclr.h"
+#include <Windows.h>
+#include <vcclr.h>
 #include "ErrorModule.h"
 #include "Token.h"
 
@@ -58,6 +58,7 @@ namespace Compilador
 	private:
 		LEX_STATE m_State;												// CURRENT STATE
 		bool m_Succeeded;												// PARSING SUCCEEDED?
+		int currentToken;
 
 		msclr::gcroot<ErrorsModule ^> managedRef_errorsModule;			// REFERENCE TO MANAGED ERRORS MODULE
 
@@ -65,7 +66,7 @@ namespace Compilador
 		std::vector<Token *> m_Tokens;									// TOKENS
 
 		void addError(int lineNum, const char *desc, std::string linebuffer);	// ADD ERROR TO ERRORS MODULE
-		void addToken(const char *lex, TOKEN_TYPE type, int lineNum);	// ADD TOKEN TO SYMBOLS TABLE AND TOKENS VECTOR
+		void addToken(const char *lex, Compilador::TOKEN_TYPE type, int lineNum);	// ADD TOKEN TO SYMBOLS TABLE AND TOKENS VECTOR
 		void clearTokens();												// FREE MEMORY AND CLEAR TOKENS VECTOR
 		std::string getCurrentLine(const char *character, const char *line);
 
@@ -90,6 +91,7 @@ namespace Compilador
 		bool parseCode(const char * src);
 		int getNumTokens() const;
 		void getTokens(std::vector<Token *> *tokensVec) const;
+		const Token* getNextToken();
 
 		bool succeeded() const
 		{

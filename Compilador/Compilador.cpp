@@ -8,11 +8,13 @@ Compilador::Manager::Manager()
 {
 	err = gcnew ErrorsModule();
 	lex = new LexAnalyzer(err);
+	syn = new SyntaxAnalyzer(err, lex);
 }
 
 Compilador::Manager::~Manager()
 {
 	delete lex;
+	delete syn;
 }
 
 cli::array<String^>^ Compilador::Manager::compile(String ^ program)
@@ -22,7 +24,7 @@ cli::array<String^>^ Compilador::Manager::compile(String ^ program)
 
 	//Clear State
 
-	if (err && lex != NULL)
+	if (err && lex && syn != NULL)
 	{
 		err->clearErrors();
 	}
@@ -39,8 +41,16 @@ cli::array<String^>^ Compilador::Manager::compile(String ^ program)
 			compilationDetails[0] = gcnew String("Invalid Lex Analyzer");
 			return compilationDetails;
 		}
+		else if (syn == NULL)
+		{
+			compilationDetails = gcnew cli::array<String^>(1);
+			compilationDetails[0] = gcnew String("Invalid Syntactic Analyzer");
+			return compilationDetails;
+		}
 	//Lex Analisis
 	lex->parseCode((const char*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(program).ToPointer());
+
+	syn->CheckSyntax();
 	
 	compilationDetails = getCompilationDetails();
 

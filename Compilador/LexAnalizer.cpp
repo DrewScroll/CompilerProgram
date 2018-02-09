@@ -5,9 +5,10 @@
 #include <algorithm>
 #include <iterator>
 
+using namespace Compilador;
 /*
 */
-Compilador::LexAnalyzer::LexAnalyzer(ErrorsModule ^ errorsModule)
+LexAnalyzer::LexAnalyzer(ErrorsModule ^ errorsModule)
 {
 	managedRef_errorsModule = errorsModule;
 
@@ -32,13 +33,13 @@ Compilador::LexAnalyzer::LexAnalyzer(ErrorsModule ^ errorsModule)
 
 /*
 */
-Compilador::LexAnalyzer::~LexAnalyzer()
+LexAnalyzer::~LexAnalyzer()
 {
 }
 
 /*
 */
-bool Compilador::LexAnalyzer::parseCode(const char * src)
+bool LexAnalyzer::parseCode(const char * src)
 {
 	int currentLineNumber = 1;
 	int firstLineComment = 0;
@@ -502,21 +503,30 @@ bool Compilador::LexAnalyzer::parseCode(const char * src)
 
 /*
 */
-int Compilador::LexAnalyzer::getNumTokens() const
+int LexAnalyzer::getNumTokens() const
 {
 	return m_Tokens.size();
 }
 
 /*
 */
-void Compilador::LexAnalyzer::getTokens(std::vector<Token *> *tokensVec) const
+void LexAnalyzer::getTokens(std::vector<Token *> *tokensVec) const
 {
 	std::copy(m_Tokens.begin(), m_Tokens.end(), std::back_inserter(*tokensVec));
 }
 
+const Token* LexAnalyzer::getNextToken()
+{
+	if (currentToken < m_Tokens.size())
+	{
+		return m_Tokens[currentToken++];
+	}
+	return nullptr;
+}
+
 /*
 */
-void Compilador::LexAnalyzer::addError(int lineNum, const char *desc, std::string lineBuffer)
+void LexAnalyzer::addError(int lineNum, const char *desc, std::string lineBuffer)
 {
 	
 	String ^ strDesc = gcnew String(desc);
@@ -527,14 +537,14 @@ void Compilador::LexAnalyzer::addError(int lineNum, const char *desc, std::strin
 
 /*
 */
-void Compilador::LexAnalyzer::addToken(const char * lex, TOKEN_TYPE type, int lineNum)
+void LexAnalyzer::addToken(const char * lex, Compilador::TOKEN_TYPE type, int lineNum)
 {
 	m_Tokens.push_back(new Token(std::string(lex), type, lineNum));
 }
 
 /*
 */
-void Compilador::LexAnalyzer::clearTokens()
+void LexAnalyzer::clearTokens()
 {
 	if (m_Tokens.size() > 0)
 	{
@@ -548,9 +558,10 @@ void Compilador::LexAnalyzer::clearTokens()
 		}
 		m_Tokens.clear();
 	}
+	currentToken = 0;
 }
 
-std::string Compilador::LexAnalyzer::getCurrentLine(const char *character, const char *line)
+std::string LexAnalyzer::getCurrentLine(const char *character, const char *line)
 {
 	std::string lineBuffer;
 	int numCharsInLine = (character - line) + 1;
@@ -562,7 +573,7 @@ std::string Compilador::LexAnalyzer::getCurrentLine(const char *character, const
 
 /*
 */
-bool Compilador::LexAnalyzer::isAlpha(const char * c) const
+bool LexAnalyzer::isAlpha(const char * c) const
 {
 	if ((*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z'))
 	{
@@ -574,7 +585,7 @@ bool Compilador::LexAnalyzer::isAlpha(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isDigit(const char * c) const
+bool LexAnalyzer::isDigit(const char * c) const
 {
 	if (*c >= '0' && *c <= '9')
 	{
@@ -586,7 +597,7 @@ bool Compilador::LexAnalyzer::isDigit(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isSpace(const char * c) const
+bool LexAnalyzer::isSpace(const char * c) const
 {
 	if (*c == ' ' || *c == '\t' || isNewLine(c))
 	{
@@ -598,7 +609,7 @@ bool Compilador::LexAnalyzer::isSpace(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isNewLine(const char * c) const
+bool LexAnalyzer::isNewLine(const char * c) const
 {
 	if (*c == '\n' || *c == '\r')
 	{
@@ -610,7 +621,7 @@ bool Compilador::LexAnalyzer::isNewLine(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isArithmeticOp(const char * c) const
+bool LexAnalyzer::isArithmeticOp(const char * c) const
 {
 	if (*c == '+' || *c == '-' || *c == '*' || *c == '/' || *c == '%' || *c == '^')
 	{
@@ -622,7 +633,7 @@ bool Compilador::LexAnalyzer::isArithmeticOp(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isRelationalOp(const char * c) const
+bool LexAnalyzer::isRelationalOp(const char * c) const
 {
 	if (*c == '<' || *c == '>' || *c == '=')
 	{
@@ -634,7 +645,7 @@ bool Compilador::LexAnalyzer::isRelationalOp(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isLogicalOp(const char * c) const
+bool LexAnalyzer::isLogicalOp(const char * c) const
 {
 	if (*c == '&' || *c == '|' || *c == '!')
 	{
@@ -646,7 +657,7 @@ bool Compilador::LexAnalyzer::isLogicalOp(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isSeparator(const char * c) const
+bool LexAnalyzer::isSeparator(const char * c) const
 {
 	if (*c == ';' || *c == ',' || *c == ':')
 	{
@@ -658,7 +669,7 @@ bool Compilador::LexAnalyzer::isSeparator(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isGroupingChar(const char * c) const
+bool LexAnalyzer::isGroupingChar(const char * c) const
 {
 	if (*c == '(' || *c == ')')
 	{
@@ -668,7 +679,7 @@ bool Compilador::LexAnalyzer::isGroupingChar(const char * c) const
 	return false;
 }
 
-bool Compilador::LexAnalyzer::isBlockChar(const char * c) const
+bool LexAnalyzer::isBlockChar(const char * c) const
 {
 	if (*c == '{' || *c == '}')
 	{
@@ -680,7 +691,7 @@ bool Compilador::LexAnalyzer::isBlockChar(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isDimensionChar(const char * c) const
+bool LexAnalyzer::isDimensionChar(const char * c) const
 {
 	if (*c == '[' || *c == ']')
 	{
@@ -692,7 +703,7 @@ bool Compilador::LexAnalyzer::isDimensionChar(const char * c) const
 
 /*
 */
-bool Compilador::LexAnalyzer::isStringLiteral(const char * c) const
+bool LexAnalyzer::isStringLiteral(const char * c) const
 {
 	if (*c == '\"')
 	{

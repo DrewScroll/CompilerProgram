@@ -2,6 +2,7 @@
 
 #pragma once
 #include "LexAnalizer.h"
+#include "SyntaxAnalyzer.h"
 #include "ErrorModule.h"
 
 using namespace System;
@@ -21,5 +22,6 @@ namespace Compilador {
 	private:
 		LexAnalyzer * lex;
 		ErrorsModule ^ err;
+		SyntaxAnalyzer * syn;
 	};
 }

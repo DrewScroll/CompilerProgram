@@ -7,11 +7,11 @@ Compilador::ErrorsModule::ErrorsModule()
 {
 	numErrors = 0;
 
-	errorsArray = gcnew cli::array<String ^>(MAX_UAD_COMPILER_ERRORS);
+	errorsArray = gcnew cli::array<System::String ^>(MAX_UAD_COMPILER_ERRORS);
 
 	for (int i = 0; i < MAX_UAD_COMPILER_ERRORS; i++)
 	{
-		errorsArray[i] = gcnew String("");
+		errorsArray[i] = gcnew System::String("");
 	}
 }
 
@@ -31,11 +31,11 @@ void Compilador::ErrorsModule::clearErrors()
 
 /*
 */
-bool Compilador::ErrorsModule::addError(ERROR_PHASE errorPhase, int lineNumber, String ^ errorDesc, String ^ errorLine)
+bool Compilador::ErrorsModule::addError(ERROR_PHASE errorPhase, int lineNumber, System::String ^ errorDesc, System::String ^ errorLine)
 {
 	if (numErrors < MAX_UAD_COMPILER_ERRORS)
 	{
-		String ^ errLine = gcnew String("");
+		System::String ^ errLine = gcnew System::String("");
 		if (errorLine->Length > 20)
 		{
 			errLine = errorLine->Substring(0, 20);
@@ -45,7 +45,7 @@ bool Compilador::ErrorsModule::addError(ERROR_PHASE errorPhase, int lineNumber, 
 			errLine = errorLine;
 		}
 
-		errorsArray->SetValue(String::Format("<{0}>: \t{1} \t\t{2} \t\t{3}", errorPhase.ToString(), lineNumber, errorDesc, errLine), numErrors);
+		errorsArray->SetValue(System::String::Format("<{0}>: \t{1} \t\t{2} \t\t{3}", errorPhase.ToString(), lineNumber, errorDesc, errLine), numErrors);
 		numErrors++;
 
 		return true;
