@@ -524,6 +524,15 @@ const Token* LexAnalyzer::getNextToken()
 	return nullptr;
 }
 
+const Token * Compilador::LexAnalyzer::peekToken(int num)
+{
+	if (((currentToken + num) < m_Tokens.size()) && ((currentToken + num) >= 0))
+	{
+		return m_Tokens[currentToken + num];
+	}
+	return nullptr;
+}
+
 /*
 */
 void LexAnalyzer::addError(int lineNum, const char *desc, std::string lineBuffer)

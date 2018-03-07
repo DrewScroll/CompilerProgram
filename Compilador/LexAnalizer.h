@@ -92,6 +92,7 @@ namespace Compilador
 		int getNumTokens() const;
 		void getTokens(std::vector<Token *> *tokensVec) const;
 		const Token* getNextToken();
+		const Token* peekToken(int num);
 
 		bool succeeded() const
 		{

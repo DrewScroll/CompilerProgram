@@ -9,6 +9,7 @@ Compilador::Manager::Manager()
 	err = gcnew ErrorsModule();
 	lex = new LexAnalyzer(err);
 	syn = new SyntaxAnalyzer(err, lex);
+	symbol = new SymTab();
 }
 
 Compilador::Manager::~Manager()

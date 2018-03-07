@@ -4,6 +4,7 @@
 #include "LexAnalizer.h"
 #include "SyntaxAnalyzer.h"
 #include "ErrorModule.h"
+#include "SymTab.h"
 
 using namespace System;
 
@@ -23,5 +24,6 @@ namespace Compilador {
 		LexAnalyzer * lex;
 		ErrorsModule ^ err;
 		SyntaxAnalyzer * syn;
+		SymTab* symbol;
 	};
 }
