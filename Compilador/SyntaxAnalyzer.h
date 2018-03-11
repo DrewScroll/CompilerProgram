@@ -23,6 +23,12 @@ namespace Compilador
 #define SYN_ERR_SAME_NAME_PARAM				"Var local no se puede llamar igual que parametro"
 #define SYN_ERR_NO_MAIN						"Main no localizada"
 #define SYN_ERR_MULT_MAIN					"Multiples Mains existentes"
+#define SYN_ERR_DIMEN						"Valor en la dimension no es un numero no es un numero"
+#define SYN_ERR_PROFUNMAIN_B4_VAR			"Procedure, Function o Main declarados anteriormente"
+#define SYN_ERR_MAIN_B4_PROCFUN				"Main declarado anteriormente"
+#define SYN_ERR_NO_ID						"ID no identificado"
+#define SYN_ERR_NO_PARM						"Parametros no identificados"
+#define SYN_ERR_NO_BLOCK					"Bloque no identificado"
 
 	class SyntaxAnalyzer
 	{
@@ -40,12 +46,13 @@ namespace Compilador
 		void checkSwitch();
 		void checkWhile();
 		void checkFor();
-		void checkDimension();
+		int checkDimension();
 		void checkRead();
 		void checkPrint();
 		void checkIf();
 		void checkParam();
 		void checkAssign();
+		void checkProcFunc();
 		void checkProc();
 		void checkFunct();
 		void checkBlock();
@@ -53,6 +60,10 @@ namespace Compilador
 		void checkListaImp();
 		void checkEXPLOG();  // !
 		void checkInc_Dec();
+		void checkBlockProcFunc();
+		void checkStatement();
+
+		bool isStatement();
 	public:
 		SyntaxAnalyzer(ErrorsModule^ err, LexAnalyzer* lex);
 		bool CheckSyntax();
