@@ -234,6 +234,40 @@ void Compilador::SyntaxAnalyzer::checkIf()
 
 void Compilador::SyntaxAnalyzer::checkParam()
 {
+	const Token* t = Lexico->getNextToken;
+	vector <std::string> temp;
+
+	while (!t->getLex().compare(")"))
+	{
+			do {
+				t = Lexico->getNextToken();
+				if (t->getType() == ID)
+				{
+					temp.push_back(t->getLex());
+				}
+				else
+				{
+					addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
+					//recoverFromError();
+				}
+				t = Lexico->getNextToken();
+			} while (!t->getLex().compare(","));
+			if (t->getLex().compare(":"))
+			{
+				addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
+				//recoverFromError();
+			}
+			t = Lexico->getNextToken();
+			checkType(temp, t);
+			t = Lexico->getNextToken();
+			if (t->getLex().compare(";"))
+			{
+				addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
+				//recoverError();
+			}
+			t = Lexico->getNextToken();
+		}
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkAssign()
