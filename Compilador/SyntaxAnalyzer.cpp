@@ -262,6 +262,7 @@ void Compilador::SyntaxAnalyzer::checkProc()
 	const Token* t = Lexico->getNextToken();
 	if (!t->getType == ID)
 	{
+		Symbols->AddSymbol();
 		t = Lexico->getNextToken();
 		if (!t->getLex().compare("("))
 		{
@@ -346,7 +347,58 @@ void Compilador::SyntaxAnalyzer::checkBlockProcFunc()
 
 void Compilador::SyntaxAnalyzer::checkStatement()
 {
+	const Token* t = Lexico->peekToken(0);
+	if (!t->getLex().compare("if"))
+	{
+		checkIf();
+	}
+	if (t->getLex().compare("while"))
+	{
+		checkWhile();
+	}
+	if (!t->getLex().compare("for"))
+	{
+		checkFor();
+	}
+	if (!t->getLex().compare("switch"))
+	{
+		checkSwitch();
+	}
+	if (!t->getLex().compare("read"))
+	{
+		checkRead();
+	}
+	if (!t->getLex().compare("print"))
+	{
+		checkPrint();
+	}
+	if (!t->getLex().compare("return"))
+	{
+		t = Lexico->getNextToken();
+		if (t->getType() != ID)
+		{
+			addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
+		}
+		else
+		{
+			t = Lexico->getNextToken();
+		}
+		t = Lexico->getNextToken();
+		if (t->getLex().compare(";"))
+		{
+			addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
+		}
+	}
+	if (!t->getLex().compare("procedure"))
+	{
+		checkCallProcFunc();
+	}
+}
 
+void Compilador::SyntaxAnalyzer::checkCallProcFunc()
+{
+	const Token* t = Lexico->peekToken(0);
+	Symbols->AddSymbol(t->getLex(),PROC,0,"procedure", );
 }
 
 bool Compilador::SyntaxAnalyzer::isStatement()
