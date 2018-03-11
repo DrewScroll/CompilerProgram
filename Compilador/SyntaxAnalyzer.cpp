@@ -105,7 +105,7 @@ void Compilador::SyntaxAnalyzer::checkVars()
 			//recoverFromError();
 		}
 		t = Lexico->getNextToken();
-		checkType(temp, t);
+		checkType(temp, t, false);
 		t = Lexico->getNextToken();
 		if (t->getLex().compare(";"))
 		{
@@ -116,13 +116,23 @@ void Compilador::SyntaxAnalyzer::checkVars()
 	}
 }
 
-void Compilador::SyntaxAnalyzer::checkType(std::vector <std::string> vars, const Token* t)
+void Compilador::SyntaxAnalyzer::checkType(std::vector <std::string> vars, const Token* t, bool isParams)
 {
 	if (!t->getLex().compare("int")|| !t->getLex().compare("float")|| !t->getLex().compare("bool")||!t->getLex().compare("string"))
 	{
-		for (int i = 0; i < vars.size(); i++)
+		if (!isParams)
 		{
-			Symbols->AddSymbol(vars[i], GLOBAL_VAR, 0, t->getLex(), "");
+			for (int i = 0; i < vars.size(); i++)
+			{
+				Symbols->AddSymbol(vars[i], GLOBAL_VAR, 0, t->getLex(), "");
+			}
+		}
+		else
+		{
+			for (int i = 0; i < vars.size(); i++)
+			{
+				Symbols->AddSymbol(vars[i], PARAM, 0, t->getLex(), "");
+			}
 		}
 	}
 	else
@@ -239,34 +249,33 @@ void Compilador::SyntaxAnalyzer::checkParam()
 
 	while (!t->getLex().compare(")"))
 	{
-			do {
-				t = Lexico->getNextToken();
-				if (t->getType() == ID)
-				{
-					temp.push_back(t->getLex());
-				}
-				else
-				{
-					addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
-					//recoverFromError();
-				}
-				t = Lexico->getNextToken();
-			} while (!t->getLex().compare(","));
-			if (t->getLex().compare(":"))
+		do {
+			t = Lexico->getNextToken();
+			if (t->getType() == ID)
 			{
-				addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
+				temp.push_back(t->getLex());
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
 				//recoverFromError();
 			}
 			t = Lexico->getNextToken();
-			checkType(temp, t);
-			t = Lexico->getNextToken();
-			if (t->getLex().compare(";"))
-			{
-				addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
-				//recoverError();
-			}
-			t = Lexico->getNextToken();
+		} while (!t->getLex().compare(","));
+		if (t->getLex().compare(":"))
+		{
+			addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
+			//recoverFromError();
 		}
+		t = Lexico->getNextToken();
+		checkType(temp, t, true);
+		t = Lexico->getNextToken();
+		if (t->getLex().compare(";"))
+		{
+			addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
+			//recoverError();
+		}
+		t = Lexico->getNextToken();
 	}
 }
 
