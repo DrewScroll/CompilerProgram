@@ -205,27 +205,7 @@ void Compilador::SyntaxAnalyzer::checkWhile()
 		t = Lexico->getNextToken();
 		if (t->getLex().compare("("))
 		{
-			t = Lexico->getNextToken();
-			if (!t->getType() == LOGICAL_OPERATOR)
-			{
-				t = Lexico->getNextToken();
-				if (!t->getType() == ID)
-				{
-					t = Lexico->getNextToken();
-				}
-			}
-			if (!t->getType() == ID || !t->getType() == INT || !t->getType() == FLOAT || !t->getType() == STRING)
-			{
-				t = Lexico->getNextToken();
-				if (!t->getType() == RELATIONAL_OPERATOR)
-				{
-					t = Lexico->getNextToken();
-					if (!t->getType() == ID || !t->getType() == INT || !t->getType() == FLOAT || !t->getType() == STRING)
-					{
-						t = Lexico->getNextToken();
-					}
-				}
-			}
+			checkEXPLOG();
 			if (!t->getLex().compare(")"))
 			{
 				t = Lexico->getNextToken();
@@ -233,6 +213,10 @@ void Compilador::SyntaxAnalyzer::checkWhile()
 			else
 			{
 				addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
+			}
+			if (!t->getLex().compare("{"))
+			{
+				checkBlock();
 			}
 		}
 		else
@@ -248,7 +232,49 @@ void Compilador::SyntaxAnalyzer::checkWhile()
 
 void Compilador::SyntaxAnalyzer::checkFor()
 {
-
+	const Token* t = Lexico->peekToken(0);
+	if (!t->getLex().compare("for"))
+	{
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("("))
+		{
+			checkAssign();
+			t = Lexico->getNextToken();
+			if (!t->getLex().compare(";"))
+			{
+				t = Lexico->getNextToken();
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
+			}
+			checkEXPLOG();
+			t = Lexico->getNextToken();
+			if (!t->getLex().compare(";"))
+			{
+				t = Lexico->getNextToken();
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
+			}
+			checkInc_Dec();
+			t = Lexico->getNextToken();
+			if (!t->getLex().compare(")"))
+			{
+				t = Lexico->getNextToken();
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
+			}
+			checkBlock();
+		}
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "for", t->getLex().c_str());
+	}
 }
 
 int Compilador::SyntaxAnalyzer::checkDimension()
@@ -287,15 +313,7 @@ void Compilador::SyntaxAnalyzer::checkRead()
 	{
 		addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
 	}
-	if (t->getType() == ID)
-	{
-		t = Lexico->getNextToken();
-		if (!t->getLex().compare("["))
-		{
-			dimen = checkDimension();
-		}
-		t = Lexico->getNextToken();
-	}
+	checkEXPLOG();
 	if (!t->getLex().compare(")"))
 	{
 		t = Lexico->getNextToken();
