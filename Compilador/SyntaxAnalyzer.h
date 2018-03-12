@@ -41,7 +41,7 @@ namespace Compilador
 		void addErrorExpect(int lineNum, const char* e, const char* f);
 		void checkProgram();
 		void checkVars();
-		void checkType(std::vector <std::string> vars, const Token* t, bool isParams);
+		void checkType(std::vector <std::string> vars, const Token* t);
 		void checkMain();
 		void checkSwitch();
 		void checkWhile();

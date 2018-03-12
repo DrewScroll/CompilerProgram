@@ -105,7 +105,7 @@ void Compilador::SyntaxAnalyzer::checkVars()
 			//recoverFromError();
 		}
 		t = Lexico->getNextToken();
-		checkType(temp, t, false);
+		checkType(temp, t);
 		t = Lexico->getNextToken();
 		if (t->getLex().compare(";"))
 		{
@@ -116,23 +116,13 @@ void Compilador::SyntaxAnalyzer::checkVars()
 	}
 }
 
-void Compilador::SyntaxAnalyzer::checkType(std::vector <std::string> vars, const Token* t, bool isParams)
+void Compilador::SyntaxAnalyzer::checkType(std::vector <std::string> vars, const Token* t)
 {
-	if (!t->getLex().compare("int")|| !t->getLex().compare("float")|| !t->getLex().compare("bool")||!t->getLex().compare("string"))
+	if (!t->getLex().compare("int") || !t->getLex().compare("float") || !t->getLex().compare("bool") || !t->getLex().compare("string"))
 	{
-		if (!isParams)
+		for (int i = 0; i < vars.size(); i++)
 		{
-			for (int i = 0; i < vars.size(); i++)
-			{
-				Symbols->AddSymbol(vars[i], GLOBAL_VAR, 0, t->getLex(), "");
-			}
-		}
-		else
-		{
-			for (int i = 0; i < vars.size(); i++)
-			{
-				Symbols->AddSymbol(vars[i], PARAM, 0, t->getLex(), "");
-			}
+			Symbols->AddSymbol(vars[i], GLOBAL_VAR, 0, t->getLex(), "");
 		}
 	}
 	else
@@ -268,7 +258,7 @@ void Compilador::SyntaxAnalyzer::checkParam()
 			//recoverFromError();
 		}
 		t = Lexico->getNextToken();
-		checkType(temp, t, true);
+		checkType(temp, t);
 		t = Lexico->getNextToken();
 		if (t->getLex().compare(";"))
 		{
@@ -334,6 +324,38 @@ void Compilador::SyntaxAnalyzer::checkProc()
 
 void Compilador::SyntaxAnalyzer::checkFunct()
 {
+	const Token* t = Lexico->getNextToken();
+	if (t->getType() == ID)
+	{
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("("))
+		{
+			checkParam();
+			t = Lexico->getNextToken();
+			if (!t->getLex().compare(":"))
+			{
+				t = Lexico->getNextToken();
+				vector <std::string> temp;
+				temp.push_back(t->getLex());
+				checkType(temp, t);
+				t = Lexico->getNextToken();
+				checkBlockProcFunc();
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
+				//recoverFromError();
+			}
+		}
+		else
+		{
+			addError(t->getLineNumber(), SYN_ERR_NO_PARM);
+		}
+	}
+	else
+	{
+		addError(t->getLineNumber(), SYN_ERR_NO_ID);
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkBlock()
@@ -355,7 +377,14 @@ void Compilador::SyntaxAnalyzer::checkEXPLOG()
 
 void Compilador::SyntaxAnalyzer::checkInc_Dec()
 {
+	const Token* t = Lexico->peekToken(0);
+	const Token* n = Lexico->getNextToken();
+	if (t != n)
+	{
+		addErrorExpect(n->getLineNumber(), t->getLex().c_str(), n->getLex().c_str());
+	}
 }
+
 
 void Compilador::SyntaxAnalyzer::checkBlockProcFunc()
 {
