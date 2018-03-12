@@ -199,10 +199,56 @@ void Compilador::SyntaxAnalyzer::checkSwitch()
 
 void Compilador::SyntaxAnalyzer::checkWhile()
 {
+	const Token* t = Lexico->peekToken(0);
+	if (!t->getLex().compare("while"))
+	{
+		t = Lexico->getNextToken();
+		if (t->getLex().compare("("))
+		{
+			t = Lexico->getNextToken();
+			if (!t->getType() == LOGICAL_OPERATOR)
+			{
+				t = Lexico->getNextToken();
+				if (!t->getType() == ID)
+				{
+					t = Lexico->getNextToken();
+				}
+			}
+			if (!t->getType() == ID || !t->getType() == INT || !t->getType() == FLOAT || !t->getType() == STRING)
+			{
+				t = Lexico->getNextToken();
+				if (!t->getType() == RELATIONAL_OPERATOR)
+				{
+					t = Lexico->getNextToken();
+					if (!t->getType() == ID || !t->getType() == INT || !t->getType() == FLOAT || !t->getType() == STRING)
+					{
+						t = Lexico->getNextToken();
+					}
+				}
+			}
+			if (!t->getLex().compare(")"))
+			{
+				t = Lexico->getNextToken();
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
+			}
+		}
+		else
+		{
+			addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
+		}
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "while", t->getLex().c_str());
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkFor()
 {
+
 }
 
 int Compilador::SyntaxAnalyzer::checkDimension()
