@@ -230,6 +230,37 @@ int Compilador::SyntaxAnalyzer::checkDimension()
 
 void Compilador::SyntaxAnalyzer::checkRead()
 {
+	const Token* t = Lexico->getNextToken();
+	int dimen = 0;
+	if (!t->getLex().compare("("))
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
+	}
+	if (t->getType() == ID)
+	{
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("["))
+		{
+			dimen = checkDimension();
+		}
+		t = Lexico->getNextToken();
+	}
+	if (!t->getLex().compare(")"))
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
+	}
+	if (t->getLex().compare(";"))
+	{
+		addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
+	}
 }
 
 //Compilador::SyntaxState::SyntaxState()
