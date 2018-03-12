@@ -62,6 +62,7 @@ namespace Compilador
 		void checkInc_Dec();
 		void checkBlockProcFunc();
 		void checkStatement();
+		void checkBlockState();
 		void checkCallProcFunc();
 
 		bool isStatement();
