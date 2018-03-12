@@ -302,6 +302,26 @@ void Compilador::SyntaxAnalyzer::checkRead()
 
 void Compilador::SyntaxAnalyzer::checkPrint()
 {
+	const Token* t = Lexico->peekToken(0);
+	if (!t->getLex().compare("print"))
+	{
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("("))
+		{
+			while (!t->getLex().compare(")"))
+			{
+				if (t->getType() != GROUPING_OPERATOR)
+				{
+					addError(t->getLineNumber(), SYN_ERR_RETURN);
+				}
+				t = Lexico->getNextToken();
+			}
+		}
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "print", t->getLex().c_str());
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkIf()
