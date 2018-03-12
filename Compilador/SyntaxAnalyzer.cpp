@@ -79,6 +79,7 @@ void Compilador::SyntaxAnalyzer::checkVars()
 {
 	const Token* t = Lexico->peekToken(0);
 	vector <std::string> temp;
+	int dimen = 0;
 	while ((t != nullptr) && (!t->getLex().compare("var")))
 	{
 		do {
@@ -95,7 +96,7 @@ void Compilador::SyntaxAnalyzer::checkVars()
 			t = Lexico->getNextToken();
 			if (!t->getLex().compare("["))
 			{
-				checkDimension();
+				dimen = checkDimension();
 				t = Lexico->getNextToken();
 			}
 		} while (!t->getLex().compare(","));
@@ -186,11 +187,11 @@ void Compilador::SyntaxAnalyzer::checkSwitch()
 			t = Lexico->getNextToken();
 			if (!t->getLex().compare("case"))
 			{
-				checkBlockState();
+				checkBlock();
 			}
 			if (!t->getLex().compare("default"))
 			{
-				checkBlockState();
+				checkBlock();
 			}
 		}
 	}
@@ -346,6 +347,29 @@ void Compilador::SyntaxAnalyzer::checkParam()
 
 void Compilador::SyntaxAnalyzer::checkAssign()
 {
+	const Token* t = Lexico->getNextToken();
+	int dimen = 0;
+	if (t->getType() == ID)
+	{
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("["))
+		{
+			dimen = checkDimension();
+			t = Lexico->getNextToken();
+		}
+		if (t->getLex().compare("="))
+		{
+			addErrorExpect(t->getLineNumber(), "=", t->getLex().c_str());
+		}
+		else
+		{
+			t = Lexico->getNextToken();
+			if (t->getType() != ID || t->getType() != INT || t->getType() != FLOAT || t->getType() != STRING)
+			{
+				addError(t->getLineNumber(), SYN_ERR_NO_ID);
+			}
+		}
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkProcFunc()
@@ -377,7 +401,7 @@ void Compilador::SyntaxAnalyzer::checkProc()
 			t = Lexico->getNextToken();
 			if (!t->getLex().compare("{"))
 			{
-				checkBlockProcFunc();
+				checkBlock();
 			}
 			else
 			{
@@ -388,7 +412,6 @@ void Compilador::SyntaxAnalyzer::checkProc()
 		{
 			addError(t->getLineNumber(), SYN_ERR_NO_PARM);
 		}
-
 	}
 	else
 	{
@@ -413,7 +436,7 @@ void Compilador::SyntaxAnalyzer::checkFunct()
 				temp.push_back(t->getLex());
 				checkType(temp, t);
 				t = Lexico->getNextToken();
-				checkBlockProcFunc();
+				checkBlock();
 			}
 			else
 			{
@@ -434,11 +457,36 @@ void Compilador::SyntaxAnalyzer::checkFunct()
 
 void Compilador::SyntaxAnalyzer::checkBlock()
 {
-	
+	const Token *t = Lexico->getNextToken();
+	if (!t->getLex().compare("{")) {
+		t = Lexico->getNextToken();
+		while (t->getLex().c_str() != "}") {
+			t = Lexico->getNextToken();
+			if (isStatement) {
+				checkStatement();
+			}
+			if ((t->getLex().compare("var"))) {
+				checkVars();
+			}
+		}
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkReturn()
 {
+	const Token* t = Lexico->peekToken(0);
+	if (t->getLex().compare("return"))
+	{
+		addErrorExpect(t->getLineNumber(), "return", t->getLex().c_str());
+	}
+	else
+	{
+		t = Lexico->getNextToken();
+		if (t->getType() != ID || t->getType() != INT || t->getType() != FLOAT || t->getType() != STRING)
+		{
+			addError(t->getLineNumber(), SYN_ERR_RETURN);
+		}
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkListaImp()
@@ -456,24 +504,6 @@ void Compilador::SyntaxAnalyzer::checkInc_Dec()
 	if (t != n)
 	{
 		addErrorExpect(n->getLineNumber(), t->getLex().c_str(), n->getLex().c_str());
-	}
-}
-
-
-void Compilador::SyntaxAnalyzer::checkBlockProcFunc()
-{
-	const Token *t = Lexico->getNextToken();
-	if (!t->getLex().compare("{")) {
-		t = Lexico->getNextToken();
-		while (t->getLex().c_str() != "}") {
-			t = Lexico->getNextToken();
-			if (isStatement) {
-				checkStatement();
-			}
-			if ((t->getLex().compare("var"))) {
-				checkVars();
-			}
-		}
 	}
 }
 
@@ -527,31 +557,10 @@ void Compilador::SyntaxAnalyzer::checkStatement()
 	}
 }
 
-void Compilador::SyntaxAnalyzer::checkBlockState()
-{
-	const Token* t = Lexico->getNextToken();
-	if (!t->getLex().compare(":"))
-	{
-		t = Lexico->getNextToken();
-		if (t->getLex().compare("var"))
-		{
-			checkVars();
-		}
-		else if (isStatement())
-		{
-			checkStatement();
-		}
-	}
-	else
-	{
-		addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
-	}
-}
-
 void Compilador::SyntaxAnalyzer::checkCallProcFunc()
 {
 	const Token* t = Lexico->peekToken(0);
-	Symbols->AddSymbol(t->getLex(),PROC,0,"procedure", );
+	//Symbols->AddSymbol(t->getLex(),PROC,0,"procedure", );
 }
 
 bool Compilador::SyntaxAnalyzer::isStatement()
