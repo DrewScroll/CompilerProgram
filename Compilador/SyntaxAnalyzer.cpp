@@ -390,6 +390,35 @@ void Compilador::SyntaxAnalyzer::checkPrint()
 
 void Compilador::SyntaxAnalyzer::checkIf()
 {
+	const Token* t = Lexico->peekToken(0);
+	if (!t->getLex().compare("if"))
+	{
+		t = Lexico->getNextToken();
+		if (t->getLex().compare("("))
+		{
+			checkEXPLOG();
+			if (!t->getLex().compare(")"))
+			{
+				t = Lexico->getNextToken();
+			}
+			else
+			{
+				addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
+			}
+			if (!t->getLex().compare("{"))
+			{
+				checkBlock();
+			}
+		}
+		else
+		{
+			addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
+		}
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "while", t->getLex().c_str());
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkParam()
