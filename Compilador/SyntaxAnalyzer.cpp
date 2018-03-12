@@ -154,6 +154,24 @@ void Compilador::SyntaxAnalyzer::checkMain()
 
 void Compilador::SyntaxAnalyzer::checkSwitch()
 {
+	const Token* t = Lexico->getNextToken();
+	if (!t->getLex().compare("("))
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
+	}
+	if (t->getType() == ID)
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addError(t->getLineNumber(), SYN_ERR_NO_ID);
+	}
+
 }
 
 void Compilador::SyntaxAnalyzer::checkWhile()
