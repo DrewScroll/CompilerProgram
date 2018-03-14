@@ -23,13 +23,15 @@ namespace Compilador
 #define SYN_ERR_SAME_NAME_PARAM				"Var local no se puede llamar igual que parametro"
 #define SYN_ERR_NO_MAIN						"Main no localizada"
 #define SYN_ERR_MULT_MAIN					"Multiples Mains existentes"
-#define SYN_ERR_DIMEN						"Valor en la dimension no es un numero no es un numero"
+#define SYN_ERR_DIMEN						"Valor en la dimension no es un numero"
+#define SYN_ERR_NO_DIMEN					"No contiene valor para dimension"
 #define SYN_ERR_PROFUNMAIN_B4_VAR			"Procedure, Function o Main declarados anteriormente"
 #define SYN_ERR_MAIN_B4_PROCFUN				"Main declarado anteriormente"
 #define SYN_ERR_NO_ID						"ID no identificado o valido"
 #define SYN_ERR_NO_PARM						"Parametros no identificados"
 #define SYN_ERR_NO_BLOCK					"Bloque no identificado"
 #define SYN_ERR_RETURN						"No hay valor aceptable para return"
+#define SYN_ERR_DEFAULT_PROC				"Ya existe default dentro del Switch"
 
 	class SyntaxAnalyzer
 	{
@@ -41,8 +43,8 @@ namespace Compilador
 		void addError(int lineNum, const char *desc);
 		void addErrorExpect(int lineNum, const char* e, const char* f);
 		void checkProgram();
-		void checkVars();
-		void checkType(std::vector <std::string> vars, const Token* t);
+		void checkVars(ENODE_CLASS nclass);
+		void checkType(map <std::string, int> vars, const Token* t, ENODE_CLASS nclass);
 		void checkMain();
 		void checkSwitch();
 		void checkWhile();
@@ -63,6 +65,8 @@ namespace Compilador
 		void checkInc_Dec();
 		void checkStatement();
 		void checkCallProcFunc();
+		void checkBlockSwitch();
+
 
 		bool isStatement();
 	public:

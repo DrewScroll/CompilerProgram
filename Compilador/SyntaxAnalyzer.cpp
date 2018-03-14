@@ -28,7 +28,7 @@ void Compilador::SyntaxAnalyzer::checkProgram()
 	while (t != NULL) {
 		if (!t->getLex().compare("var"))
 		{
-			checkVars();
+			checkVars(GLOBAL_VAR);
 			varsProcessed = true;
 			if (mainProcessed || functprocProcessed)
 			{
@@ -75,28 +75,39 @@ bool Compilador::SyntaxAnalyzer::CheckSyntax()
 	return (managedRef_errorsModule->NumErrorsSyn == 0);
 }
 
-void Compilador::SyntaxAnalyzer::checkVars()
+void Compilador::SyntaxAnalyzer::checkVars(ENODE_CLASS nclass)
 {
 	const Token* t = Lexico->peekToken(0);
-	vector <std::string> temp;
+	map <std::string, int> temp;
 	int dimen = 0;
 	while ((t != nullptr) && (!t->getLex().compare("var")))
 	{
 		do {
 			t = Lexico->getNextToken();
+			string stemp;
 			if (t->getType() == ID)
 			{
-				temp.push_back(t->getLex());
+				temp.insert(std::make_pair(t->getLex(), 0));
+				stemp = t->getLex();
 			}
 			else
 			{
 				addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
+				stemp = "";
 				//recoverFromError();
 			}
 			t = Lexico->getNextToken();
 			if (!t->getLex().compare("["))
 			{
 				dimen = checkDimension();
+				if (dimen > 0 && stemp != "")
+				{
+					auto it = temp.find(stemp);
+					if (it != temp.end())
+					{
+						it->second = dimen;
+					}
+				}
 				t = Lexico->getNextToken();
 			}
 		} while (!t->getLex().compare(","));
@@ -106,7 +117,7 @@ void Compilador::SyntaxAnalyzer::checkVars()
 			//recoverFromError();
 		}
 		t = Lexico->getNextToken();
-		checkType(temp, t);
+		checkType(temp, t, nclass);
 		t = Lexico->getNextToken();
 		if (t->getLex().compare(";"))
 		{
@@ -117,13 +128,13 @@ void Compilador::SyntaxAnalyzer::checkVars()
 	}
 }
 
-void Compilador::SyntaxAnalyzer::checkType(std::vector <std::string> vars, const Token* t)
+void Compilador::SyntaxAnalyzer::checkType(map <std::string, int> vars, const Token* t, ENODE_CLASS nclass)
 {
 	if (!t->getLex().compare("int") || !t->getLex().compare("float") || !t->getLex().compare("bool") || !t->getLex().compare("string"))
 	{
-		for (int i = 0; i < vars.size(); i++)
+		for (auto it = vars.begin(); it != vars.end(); it++)
 		{
-			Symbols->AddSymbol(vars[i], GLOBAL_VAR, 0, t->getLex(), "");
+			Symbols->AddSymbol(it->first, nclass, it->second, t->getLex(), "");
 		}
 	}
 	else
@@ -138,24 +149,25 @@ void Compilador::SyntaxAnalyzer::checkMain()
 	if (!t->getLex().compare("("))
 	{
 		t = Lexico->getNextToken();
-		if (!t->getLex().compare(")"))
-		{
-			checkBlock();
-		}
-		else
-		{
-			addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
-		}
 	}
 	else
 	{
 		addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
+	}
+	if (!t->getLex().compare(")"))
+	{
+		checkBlock();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
 	}
 }
 
 void Compilador::SyntaxAnalyzer::checkSwitch()
 {
 	const Token* t = Lexico->getNextToken();
+	bool isDefault = false, DefaultProc = false;
 	if (!t->getLex().compare("("))
 	{
 		t = Lexico->getNextToken();
@@ -182,17 +194,36 @@ void Compilador::SyntaxAnalyzer::checkSwitch()
 	}
 	if (!t->getLex().compare("{"))
 	{
-		while (t->getLex().compare("}"))
+		t = Lexico->peekToken(0);
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "{", t->getLex().c_str());
+	}
+	while (t->getLex().compare("}"))
+	{
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("case"))
 		{
+			if (DefaultProc)
+			{
+				addError(t->getLineNumber(), SYN_ERR_DEFAULT_PROC);
+			}
 			t = Lexico->getNextToken();
-			if (!t->getLex().compare("case"))
+			if (t->getType() == INT || t->getType() == STRING)
 			{
-				checkBlock();
+				checkBlockSwitch();
 			}
-			if (!t->getLex().compare("default"))
+			else
 			{
-				checkBlock();
+				addErrorExpect(t->getLineNumber(), "int o string", t->getLex().c_str());
 			}
+		}
+		if (!t->getLex().compare("default") && !isDefault)
+		{
+			checkBlockSwitch();
+			isDefault = true;
+			DefaultProc = true;
 		}
 	}
 }
@@ -203,30 +234,30 @@ void Compilador::SyntaxAnalyzer::checkWhile()
 	if (!t->getLex().compare("while"))
 	{
 		t = Lexico->getNextToken();
-		if (t->getLex().compare("("))
-		{
-			checkEXPLOG();
-			if (!t->getLex().compare(")"))
-			{
-				t = Lexico->getNextToken();
-			}
-			else
-			{
-				addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
-			}
-			if (!t->getLex().compare("{"))
-			{
-				checkBlock();
-			}
-		}
-		else
-		{
-			addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
-		}
 	}
 	else
 	{
 		addErrorExpect(t->getLineNumber(), "while", t->getLex().c_str());
+	}
+	if (t->getLex().compare("("))
+	{
+		checkEXPLOG();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "(", t->getLex().c_str());
+	}
+	if (!t->getLex().compare(")"))
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
+	}
+	if (!t->getLex().compare("{"))
+	{
+		checkBlock();
 	}
 }
 
@@ -280,24 +311,21 @@ void Compilador::SyntaxAnalyzer::checkFor()
 int Compilador::SyntaxAnalyzer::checkDimension()
 {
 	const Token* t = Lexico->getNextToken();
-	if (!t->getLex().compare("["))
+	t = Lexico->getNextToken();
+	if (t->getType() == INT || !t->getLex().compare("]"))
 	{
-		t = Lexico->getNextToken();
-		if (t->getType() == INT || !t->getLex().compare("]"))
+		if (t->getType() == INT)
 		{
-			if (t->getType() == INT)
-			{
-				return stoi(t->getLex());
-			}
-			else if (!t->getLex().compare("]"))
-			{
-				return 0;
-			}
+			return stoi(t->getLex());
 		}
-		else
+		else if (!t->getLex().compare("]"))
 		{
-			addError(t->getLineNumber(), SYN_ERR_DIMEN);
+			addError(t->getLineNumber(), SYN_ERR_NO_DIMEN);
 		}
+	}
+	else
+	{
+		addError(t->getLineNumber(), SYN_ERR_DIMEN);
 	}
 }
 
@@ -424,22 +452,38 @@ void Compilador::SyntaxAnalyzer::checkIf()
 void Compilador::SyntaxAnalyzer::checkParam()
 {
 	const Token* t = Lexico->getNextToken;
-	vector <std::string> temp;
-
+	map <std::string, int> temp;
+	int dimen = 0;
 	while (!t->getLex().compare(")"))
 	{
 		do {
 			t = Lexico->getNextToken();
+			string stemp;
 			if (t->getType() == ID)
 			{
-				temp.push_back(t->getLex());
+				temp.insert(std::make_pair(t->getLex(), 0));
+				stemp = t->getLex();
 			}
 			else
 			{
 				addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
+				stemp = "";
 				//recoverFromError();
 			}
 			t = Lexico->getNextToken();
+			if (!t->getLex().compare("["))
+			{
+				dimen = checkDimension();
+				if (dimen > 0 && stemp != "")
+				{
+					auto it = temp.find(stemp);
+					if (it != temp.end())
+					{
+						it->second = dimen;
+					}
+				}
+				t = Lexico->getNextToken();
+			}
 		} while (!t->getLex().compare(","));
 		if (t->getLex().compare(":"))
 		{
@@ -447,14 +491,12 @@ void Compilador::SyntaxAnalyzer::checkParam()
 			//recoverFromError();
 		}
 		t = Lexico->getNextToken();
-		checkType(temp, t);
+		checkType(temp, t, PARAM);
 		t = Lexico->getNextToken();
-		if (t->getLex().compare(";"))
+		if (t->getLex().compare(";") && t->getLex().compare(")"))
 		{
-			addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
-			//recoverError();
+			addErrorExpect(t->getLineNumber(), ")", t->getLex().c_str());
 		}
-		t = Lexico->getNextToken();
 	}
 }
 
@@ -487,18 +529,14 @@ void Compilador::SyntaxAnalyzer::checkAssign()
 
 void Compilador::SyntaxAnalyzer::checkProcFunc()
 {
-	const Token* t = Lexico->getNextToken();
+	const Token* t = Lexico->peekToken(0);
 	if (!t->getLex().compare("function"))
 	{
 		checkFunct();
 	}
-	else if (!t->getLex().compare("procedure"))
-	{
-		checkProc();
-	}
 	else
 	{
-		checkProcFunc();
+		checkProc();
 	}
 }
 
@@ -508,79 +546,88 @@ void Compilador::SyntaxAnalyzer::checkProc()
 	if (!t->getType == ID)
 	{
 		t = Lexico->getNextToken();
-		if (!t->getLex().compare("("))
-		{
-			checkParam();
-			t = Lexico->getNextToken();
-			if (!t->getLex().compare("{"))
-			{
-				checkBlock();
-			}
-			else
-			{
-				addError(t->getLineNumber, SYN_ERR_NO_BLOCK);
-			}
-		}
-		else
-		{
-			addError(t->getLineNumber(), SYN_ERR_NO_PARM);
-		}
 	}
 	else
 	{
 		addError(t->getLineNumber(), SYN_ERR_NO_ID);
+	}
+	if (!t->getLex().compare("("))
+	{
+		checkParam();
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addError(t->getLineNumber(), SYN_ERR_NO_PARM);
+	}
+	if (!t->getLex().compare("{"))
+	{
+		checkBlock();
+	}
+	else
+	{
+		addError(t->getLineNumber, SYN_ERR_NO_BLOCK);
 	}
 }
 
 void Compilador::SyntaxAnalyzer::checkFunct()
 {
+	map <std::string, int> temp;
+
 	const Token* t = Lexico->getNextToken();
 	if (t->getType() == ID)
 	{
+		temp.insert(std::make_pair(t->getLex(), 0));
 		t = Lexico->getNextToken();
-		if (!t->getLex().compare("("))
-		{
-			checkParam();
-			t = Lexico->getNextToken();
-			if (!t->getLex().compare(":"))
-			{
-				t = Lexico->getNextToken();
-				vector <std::string> temp;
-				temp.push_back(t->getLex());
-				checkType(temp, t);
-				t = Lexico->getNextToken();
-				checkBlock();
-			}
-			else
-			{
-				addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
-				//recoverFromError();
-			}
-		}
-		else
-		{
-			addError(t->getLineNumber(), SYN_ERR_NO_PARM);
-		}
 	}
 	else
 	{
 		addError(t->getLineNumber(), SYN_ERR_NO_ID);
 	}
+	if (!t->getLex().compare("("))
+	{
+		checkParam();
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addError(t->getLineNumber(), SYN_ERR_NO_PARM);
+	}
+	if (!t->getLex().compare(":"))
+	{
+		t = Lexico->getNextToken();
+		checkType(temp, t, FUNC);
+		t = Lexico->getNextToken();
+		if (!t->getLex().compare("{"))
+		{
+			checkBlock();
+		}
+		else
+		{
+			addErrorExpect(t->getLineNumber(), "{", t->getLex().c_str());
+		}
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
+		//recoverFromError();
+	}
 }
 
 void Compilador::SyntaxAnalyzer::checkBlock()
 {
-	const Token *t = Lexico->getNextToken();
-	if (!t->getLex().compare("{")) {
+	const Token *t = Lexico->peekToken(0);
+
+	if ((t->getLex().compare("var")))
+	{
+		checkVars(LOCAL_VAR);
+	}
+
+	while (t->getLex().c_str() != "}")
+	{
 		t = Lexico->getNextToken();
-		while (t->getLex().c_str() != "}") {
-			t = Lexico->getNextToken();
-			if (isStatement) {
-				checkStatement();
-			}
-			if ((t->getLex().compare("var"))) {
-				checkVars();
-			}
+		if (isStatement()) {
+			checkStatement();
 		}
 	}
 }
@@ -649,24 +696,7 @@ void Compilador::SyntaxAnalyzer::checkStatement()
 	}
 	if (!t->getLex().compare("return"))
 	{
-		t = Lexico->getNextToken();
-		if (t->getType() != ID)
-		{
-			addErrorExpect(t->getLineNumber(), "id", t->getLex().c_str());
-		}
-		else
-		{
-			t = Lexico->getNextToken();
-		}
-		t = Lexico->getNextToken();
-		if (t->getLex().compare(";"))
-		{
-			addErrorExpect(t->getLineNumber(), ";", t->getLex().c_str());
-		}
-	}
-	if (!t->getLex().compare("procedure"))
-	{
-		checkCallProcFunc();
+		checkReturn();
 	}
 }
 
@@ -676,10 +706,38 @@ void Compilador::SyntaxAnalyzer::checkCallProcFunc()
 	//Symbols->AddSymbol(t->getLex(),PROC,0,"procedure", );
 }
 
+void Compilador::SyntaxAnalyzer::checkBlockSwitch()
+{
+	const Token* t = Lexico->getNextToken();
+	if (!t->getLex().compare(":"))
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), ":", t->getLex().c_str());
+	}
+	if (!t->getLex().compare("{"))
+	{
+		t = Lexico->getNextToken();
+	}
+	else
+	{
+		addErrorExpect(t->getLineNumber(), "{", t->getLex().c_str());
+	}
+	while (t->getLex().compare("}"))
+	{
+		if (isStatement())
+		{
+			checkStatement();
+		}
+	}
+}
+
 bool Compilador::SyntaxAnalyzer::isStatement()
 {
 	const Token* t = Lexico->peekToken(0);
-	if (!t->getLex().compare("if") || t->getLex().compare("while") || t->getLex().compare("for") || t->getLex().compare("switch") || t->getLex().compare("read") || t->getLex().compare("print") || t->getLex().compare("return") || t->getLex().compare("procedure") || t->getLex().compare("function"))
+	if (!t->getLex().compare("if") || t->getLex().compare("while") || t->getLex().compare("for") || t->getLex().compare("switch") || t->getLex().compare("read") || t->getLex().compare("print") || t->getLex().compare("return"))
 		return true;
 	return false;
 }
