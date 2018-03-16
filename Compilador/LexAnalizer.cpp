@@ -35,6 +35,10 @@ LexAnalyzer::LexAnalyzer(ErrorsModule ^ errorsModule)
 */
 LexAnalyzer::~LexAnalyzer()
 {
+	for (auto it = m_Tokens.begin(); it != m_Tokens.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 /*

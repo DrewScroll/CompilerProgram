@@ -1,59 +1,16 @@
 #include "stdafx.h"
 #include "SymTab.h"
 
-Compilador::GlobalNode::GlobalNode(std::string _symbol, ENODE_CLASS _nclass, int _dimen, std::string _typ)
-{
-	symbol = _symbol;
-	nclass = _nclass;
-	dimen = _dimen;
-	typ = _typ;
-	val = NULL;
-	localNode = NULL;
-}
-
-Compilador::GlobalNode::~GlobalNode()
-{
-}
-
-void Compilador::GlobalNode::setLocalNode(LocalNode * n)
-{
-	if (localNode == nullptr)
-	{
-		localNode = n;
-	}
-	else
-	{
-		LocalNode* temp = localNode;
-		localNode = n;
-		n->setNext(temp);
-	}
-}
-
-Compilador::LocalNode::LocalNode(ENODE_CLASS _nclass, std::string _typ, int _dimen, std::string _nproc_func)
-{
-	nclass = _nclass;
-	typ = _typ;
-	dimen = _dimen;
-	nproc_func = _nproc_func;
-	val = NULL;
-	next = NULL;
-}
-
-Compilador::LocalNode::~LocalNode()
-{
-}
-
-void Compilador::LocalNode::setNext(LocalNode * n)
-{
-	next = n;
-}
-
 Compilador::SymTab::SymTab()
 {
 }
 
 Compilador::SymTab::~SymTab()
 {
+	for (auto it = m_nodes.begin(); it != m_nodes.end(); it++)
+	{
+		delete it->second;
+	}
 }
 
 bool Compilador::SymTab::SymbolExists(std::string symbol, ENODE_CLASS nclass, std::string nproc_func)
@@ -92,6 +49,34 @@ bool Compilador::SymTab::AddSymbol(std::string symbol, ENODE_CLASS nclass, int d
 {
 	if (!SymbolExists(symbol, nclass, nproc_func))
 	{
+		if (nclass == GLOBAL_VAR || nclass == LOCAL_VAR || nclass == PARAM)
+		{
+			if (SymbolExists(symbol, PROC, nproc_func))
+			{
+				//addError()
+				return false;
+			}
+			if (SymbolExists(symbol, FUNC, nproc_func))
+			{
+				return false;
+			}
+		}
+		else if (nclass == PROC)
+		{
+			if (SymbolExists(symbol, FUNC, nproc_func))
+			{
+				//adderror
+				return false;
+			}
+		}
+		else if (nclass == FUNC)
+		{
+			if (SymbolExists(symbol, PROC, nproc_func))
+			{
+				//addError
+				return false;
+			}
+		}
 		if (nclass == GLOBAL_VAR || nclass == PROC || nclass == FUNC)
 		{
 			m_nodes.insert(std::make_pair(symbol, new GlobalNode(symbol, nclass, dimen, typ)));
@@ -111,14 +96,7 @@ bool Compilador::SymTab::AddSymbol(std::string symbol, ENODE_CLASS nclass, int d
 				gnode->setLocalNode(lnode);
 			}
 		}
+		return true;
 	}
 	return false;
-}
-
-Compilador::NodeVal::NodeVal()
-{
-}
-
-Compilador::NodeVal::~NodeVal()
-{
 }

@@ -71,6 +71,7 @@ namespace Compilador
 		bool isStatement();
 	public:
 		SyntaxAnalyzer(ErrorsModule^ err, LexAnalyzer* lex);
+		~SyntaxAnalyzer();
 		bool CheckSyntax();
 
 	};

@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Archivos de código fuente\Lexico">
+      <UniqueIdentifier>{634b7dcb-1b6f-464d-9f3b-192f7748fa8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Lexico">
+      <UniqueIdentifier>{00394393-e279-4f31-94d7-72a60b63eb21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de código fuente\Sintactico">
+      <UniqueIdentifier>{5b98f9df-959d-4a72-bee1-b24135c6648c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Sintactico">
+      <UniqueIdentifier>{a948e715-dc40-4a08-9674-55f555474b70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compilador.h">
@@ -24,20 +36,29 @@
     <ClInclude Include="resource.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="LexAnalizer.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="ErrorModule.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="LexAnalizer.h">
+      <Filter>Archivos de encabezado\Lexico</Filter>
+    </ClInclude>
     <ClInclude Include="Token.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Archivos de encabezado\Lexico</Filter>
     </ClInclude>
     <ClInclude Include="SyntaxAnalyzer.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Archivos de encabezado\Sintactico</Filter>
     </ClInclude>
     <ClInclude Include="SymTab.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Archivos de encabezado\Sintactico</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalNode.h">
+      <Filter>Archivos de encabezado\Sintactico</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalNode.h">
+      <Filter>Archivos de encabezado\Sintactico</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeVal.h">
+      <Filter>Archivos de encabezado\Sintactico</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -50,20 +71,29 @@
     <ClCompile Include="Stdafx.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="LexAnalizer.cpp">
-      <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
     <ClCompile Include="ErrorModule.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
     <ClCompile Include="Token.cpp">
-      <Filter>Archivos de código fuente</Filter>
+      <Filter>Archivos de código fuente\Lexico</Filter>
+    </ClCompile>
+    <ClCompile Include="LexAnalizer.cpp">
+      <Filter>Archivos de código fuente\Lexico</Filter>
     </ClCompile>
     <ClCompile Include="SyntaxAnalyzer.cpp">
-      <Filter>Archivos de código fuente</Filter>
+      <Filter>Archivos de código fuente\Sintactico</Filter>
     </ClCompile>
     <ClCompile Include="SymTab.cpp">
-      <Filter>Archivos de código fuente</Filter>
+      <Filter>Archivos de código fuente\Sintactico</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalNode.cpp">
+      <Filter>Archivos de código fuente\Sintactico</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalNode.cpp">
+      <Filter>Archivos de código fuente\Sintactico</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeVal.cpp">
+      <Filter>Archivos de código fuente\Sintactico</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
