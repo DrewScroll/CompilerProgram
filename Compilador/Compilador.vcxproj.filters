@@ -25,6 +25,12 @@
     <Filter Include="Archivos de encabezado\Sintactico">
       <UniqueIdentifier>{a948e715-dc40-4a08-9674-55f555474b70}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de código fuente\Semantico">
+      <UniqueIdentifier>{a0937983-592c-4744-965c-1ef199598fec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Semantico">
+      <UniqueIdentifier>{5bd03103-c32a-454e-9446-17a02f4d677d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compilador.h">
@@ -60,6 +66,15 @@
     <ClInclude Include="NodeVal.h">
       <Filter>Archivos de encabezado\Sintactico</Filter>
     </ClInclude>
+    <ClInclude Include="SemanticAnalyzer.h">
+      <Filter>Archivos de encabezado\Semantico</Filter>
+    </ClInclude>
+    <ClInclude Include="ExpLogTree.h">
+      <Filter>Archivos de encabezado\Semantico</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeExpLog.h">
+      <Filter>Archivos de encabezado\Semantico</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compilador.cpp">
@@ -94,6 +109,15 @@
     </ClCompile>
     <ClCompile Include="NodeVal.cpp">
       <Filter>Archivos de código fuente\Sintactico</Filter>
+    </ClCompile>
+    <ClCompile Include="SemanticAnalyzer.cpp">
+      <Filter>Archivos de código fuente\Semantico</Filter>
+    </ClCompile>
+    <ClCompile Include="ExpLogTree.cpp">
+      <Filter>Archivos de código fuente\Semantico</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeExpLog.cpp">
+      <Filter>Archivos de código fuente\Semantico</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

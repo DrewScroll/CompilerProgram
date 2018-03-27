@@ -36,5 +36,6 @@ namespace Compilador
 		LocalNode* getNext() { return next; }
 		ENODE_CLASS getNodeClass() { return nclass; }
 		std::string getnProcFunc() { return nproc_func; }
+		std::string getType() { return typ; }
 	};
 }

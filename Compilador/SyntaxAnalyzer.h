@@ -32,6 +32,17 @@ namespace Compilador
 #define SYN_ERR_NO_BLOCK					"Bloque no identificado"
 #define SYN_ERR_RETURN						"No hay valor aceptable para return"
 #define SYN_ERR_DEFAULT_PROC				"Ya existe default dentro del Switch"
+#define SYN_ERR_NO_OPERANDS					"La expresion no contiene operandos"
+#define SYN_ERR_NO_OPERATORS				"La expresion tiene una cantidad mayor o menor de operadores"
+#define SYN_ERR_NO_PARENTHESIS				"No se cerro parentesis en la expresion"
+#define SYN_ERR_NEGATE						"Solo se puede negar constantes logicas"
+#define SYN_ERR_CALL_PROC_EXP				"No se puede llamar un procedimiento en una expresion"
+	
+	struct S_Nested_Level
+	{
+		int numOperators = 0;
+		int numOperands = 0;
+	};
 
 	class SyntaxAnalyzer
 	{
@@ -61,7 +72,11 @@ namespace Compilador
 		void checkBlock();
 		void checkReturn();
 		void checkListaImp();
-		void checkEXPLOG();  // !
+		bool processExpression();
+		bool isOperator(const Token* t);
+		bool isConst(const Token* t);
+		void checkEXPLOG(vector <S_Nested_Level> *nestedLevels, int *currentNestedLevel, int *NumErrors);  // !
+		void checkTerm(vector <S_Nested_Level> *nestedLevels, int *currentNestedLevel, int *NumErrors);
 		void checkInc_Dec();
 		void checkStatement();
 		void checkCallProcFunc();

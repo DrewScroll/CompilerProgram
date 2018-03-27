@@ -135,11 +135,14 @@
   <ItemGroup>
     <ClInclude Include="Compilador.h" />
     <ClInclude Include="ErrorModule.h" />
+    <ClInclude Include="ExpLogTree.h" />
     <ClInclude Include="GlobalNode.h" />
     <ClInclude Include="LexAnalizer.h" />
     <ClInclude Include="LocalNode.h" />
+    <ClInclude Include="NodeExpLog.h" />
     <ClInclude Include="NodeVal.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SemanticAnalyzer.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="SymTab.h" />
     <ClInclude Include="SyntaxAnalyzer.h" />
@@ -149,10 +152,13 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Compilador.cpp" />
     <ClCompile Include="ErrorModule.cpp" />
+    <ClCompile Include="ExpLogTree.cpp" />
     <ClCompile Include="GlobalNode.cpp" />
     <ClCompile Include="LexAnalizer.cpp" />
     <ClCompile Include="LocalNode.cpp" />
+    <ClCompile Include="NodeExpLog.cpp" />
     <ClCompile Include="NodeVal.cpp" />
+    <ClCompile Include="SemanticAnalyzer.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

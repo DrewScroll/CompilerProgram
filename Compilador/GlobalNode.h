@@ -22,5 +22,6 @@ namespace Compilador
 		ENODE_CLASS getNodeClass() { return nclass; }
 		std::string getSymbol() { return symbol; }
 		LocalNode* const getLocalNode() { return localNode; }
+		std::string getType() { return typ; }
 	};
 }

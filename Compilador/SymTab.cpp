@@ -45,6 +45,15 @@ bool Compilador::SymTab::SymbolExists(std::string symbol, ENODE_CLASS nclass, st
 	return false;
 }
 
+bool Compilador::SymTab::SymbolExists(std::string symbol)
+{
+	if (m_nodes.find(symbol) != m_nodes.end())
+	{
+		return true;
+	}
+	return false;
+}
+
 bool Compilador::SymTab::AddSymbol(std::string symbol, ENODE_CLASS nclass, int dimen, std::string typ, std::string nproc_func)
 {
 	if (!SymbolExists(symbol, nclass, nproc_func))
@@ -99,4 +108,26 @@ bool Compilador::SymTab::AddSymbol(std::string symbol, ENODE_CLASS nclass, int d
 		return true;
 	}
 	return false;
+}
+
+Compilador::ENODE_CLASS Compilador::SymTab::getSymbolClass(std::string symbol)
+{
+	if (SymbolExists(symbol))
+	{
+		auto it = m_nodes.find(symbol);
+		GlobalNode* g_node = it->second;
+		ENODE_CLASS nclass = g_node->getNodeClass();
+		if (nclass == UNDEF)
+		{
+			LocalNode* l_node = g_node->getLocalNode();
+			nclass = l_node->getNodeClass();
+		}
+		return nclass;
+	}
+	return UNDEF;
+}
+
+std::string Compilador::SymTab::getSymbolType(std::string symbol, ENODE_CLASS nclass, std::string nproc_func)
+{
+	return std::string();
 }
